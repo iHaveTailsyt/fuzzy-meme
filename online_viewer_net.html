@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Just For You 💖</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(to bottom, #ffe0e0, #fff0f5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  h1 { color: #ff4d6d; text-align: center; margin-top: 20px; }
+  
+  /* Tabs */
+  .tabs {
+    display: flex;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  .tab {
+    padding: 10px 20px;
+    background: #ffccd5;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.3s;
+  }
+  .tab:hover { background: #ff99aa; }
+  .tab.active { background: #ff4d6d; color: white; }
+  
+  /* Content */
+  .tab-content {
+    display: none;
+    margin-top: 20px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+  }
+  .tab-content.active { display: block; }
+  
+  /* Heart styles */
+  .heart {
+    position: absolute;
+    color: #ff4d6d;
+    font-size: 36px;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  
+  /* About You text */
+  .about p {
+    font-size: 20px;
+    color: #ff4d6d;
+  }
+  
+  /* Surprise Button */
+  .surprise button {
+    padding: 15px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .surprise button:hover { background: #ff99aa; }
+</style>
+</head>
+<body>
+
+<h1>Just For You 💖</h1>
+
+<div class="tabs">
+  <div class="tab active" data-tab="hearts">Hearts</div>
+  <div class="tab" data-tab="about">About You</div>
+  <div class="tab" data-tab="surprise">Surprise</div>
+</div>
+
+<div id="hearts" class="tab-content active"></div>
+
+<div id="about" class="tab-content about">
+  <p>You are amazing, funny, and incredibly kind! 😄💖</p>
+  <p>Just thought you should know…</p>
+</div>
+
+<div id="surprise" class="tab-content surprise">
+  <button id="reveal">Click me for a secret message!</button>
+  <p id="secretMessage"></p>
+</div>
+
+<script>
+// --- Tab functionality ---
+const tabs = document.querySelectorAll('.tab');
+const contents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+// --- Heart animation ---
+function createHeart() {
+  const heart = document.createElement('div');
+  heart.classList.add('heart');
+  heart.textContent = '❤️';
+  
+  heart.style.left = Math.random() * window.innerWidth + 'px';
+  heart.style.top = '-50px';
+  
+  heart.addEventListener('click', () => {
+    alert("You’re amazing 😄💖");
+    heart.remove();
+  });
+  
+  document.body.appendChild(heart);
+  
+  let top = -50;
+  const fall = setInterval(() => {
+    if (top > window.innerHeight) {
+      heart.remove();
+      clearInterval(fall);
+    } else {
+      top += 2 + Math.random() * 3;
+      heart.style.top = top + 'px';
+    }
+  }, 20);
+}
+
+// Only create hearts when Hearts tab is active
+let heartInterval;
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    if(tab.dataset.tab === 'hearts') {
+      if(!heartInterval) heartInterval = setInterval(createHeart, 500);
+    } else {
+      clearInterval(heartInterval);
+      heartInterval = null;
+    }
+  });
+});
+// Start hearts on load
+heartInterval = setInterval(createHeart, 500);
+
+// --- Surprise button ---
+document.getElementById('reveal').addEventListener('click', () => {
+  const messages = [
+    "You’re the coolest! 😄💖",
+    "I think about you a lot… 😊",
+    "You make the world brighter 🌟",
+    "I really like you 💖"
+  ];
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  document.getElementById('secretMessage').textContent = randomMessage;
+});
+</script>
+
+</body>
+</html>
