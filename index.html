@@ -21,6 +21,8 @@
     display: flex;
     margin-top: 20px;
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .tab {
     padding: 10px 20px;
@@ -60,7 +62,7 @@
   }
   
   /* Surprise Button */
-  .surprise button {
+  .surprise button, .pets button {
     padding: 15px 25px;
     font-size: 18px;
     border: none;
@@ -70,23 +72,32 @@
     cursor: pointer;
     transition: 0.3s;
   }
-  .surprise button:hover { background: #ff99aa; }
+  .surprise button:hover, .pets button:hover { background: #ff99aa; }
+
+  .pets img {
+    margin-top: 15px;
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
 </style>
 </head>
 <body>
 
-<h1>Just For You 💖</h1>
+<h1 id="title">Just For You 💖</h1>
 
 <div class="tabs">
   <div class="tab active" data-tab="hearts">Hearts</div>
   <div class="tab" data-tab="about">About You</div>
   <div class="tab" data-tab="surprise">Surprise</div>
+  <div class="tab" data-tab="pets">Pets</div>
+  <div class="tab" data-tab="translate">Translate</div>
 </div>
 
 <div id="hearts" class="tab-content active"></div>
 
 <div id="about" class="tab-content about">
-  <p>You are amazing, funny, and incredibly kind! 😄💖</p>
+  <p id="aboutText">You are amazing, funny, and incredibly kind! 😄💖</p>
   <p>Just thought you should know…</p>
 </div>
 
@@ -95,75 +106,72 @@
   <p id="secretMessage"></p>
 </div>
 
+<div id="pets" class="tab-content pets">
+  <button id="showPet">Show me a cute pet!</button>
+  <img id="petImage" src="" alt="" style="display:none;">
+</div>
+
+<div id="translate" class="tab-content translate">
+  <button id="toggleLanguage">Español</button>
+</div>
+
 <script>
-// --- Tab functionality ---
-const tabs = document.querySelectorAll('.tab');
-const contents = document.querySelectorAll('.tab-content');
+  // Funcionalidad de pestañas
+  const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.tab-content');
+  const title = document.getElementById('title');
+  const aboutText = document.getElementById('aboutText');
+  const revealButton = document.getElementById('reveal');
+  const secretMessage = document.getElementById('secretMessage');
+  const petButton = document.getElementById('showPet');
+  const petImage = document.getElementById('petImage');
+  const toggleLanguageButton = document.getElementById('toggleLanguage');
 
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => t.classList.remove('active'));
-    contents.forEach(c => c.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
+  let isEnglish = true;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
   });
-});
 
-// --- Heart animation ---
-function createHeart() {
-  const heart = document.createElement('div');
-  heart.classList.add('heart');
-  heart.textContent = '❤️';
-  
-  heart.style.left = Math.random() * window.innerWidth + 'px';
-  heart.style.top = '-50px';
-  
-  heart.addEventListener('click', () => {
-    alert("You’re amazing 😄💖");
-    heart.remove();
+  // Mostrar mensaje secreto
+  revealButton.addEventListener('click', () => {
+    const messages = isEnglish
+      ? ["You’re the coolest! 😄💖", "I think about you a lot… 😊", "You make the world brighter 🌟", "You’re truly special 💖"]
+      : ["¡Eres increíble! 😄💖", "Pienso en ti a menudo… 😊", "Haces el mundo más brillante 🌟", "Eres realmente especial 💖"];
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    secretMessage.textContent = randomMessage;
   });
-  
-  document.body.appendChild(heart);
-  
-  let top = -50;
-  const fall = setInterval(() => {
-    if (top > window.innerHeight) {
-      heart.remove();
-      clearInterval(fall);
-    } else {
-      top += 2 + Math.random() * 3;
-      heart.style.top = top + 'px';
-    }
-  }, 20);
-}
 
-// Only create hearts when Hearts tab is active
-let heartInterval;
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    if(tab.dataset.tab === 'hearts') {
-      if(!heartInterval) heartInterval = setInterval(createHeart, 500);
-    } else {
-      clearInterval(heartInterval);
-      heartInterval = null;
-    }
+  // Mostrar imagen de mascota
+  petButton.addEventListener('click', async () => {
+    const petType = Math.random() < 0.5 ? 'dog' : 'cat';
+    const url = petType === 'dog'
+      ? 'https://dog.ceo/api/breeds/image/random'
+      : 'https://api.thecatapi.com/v1/images/search';
+    const response = await fetch(url);
+    const data = await response.json();
+    const imageUrl = petType === 'dog' ? data.message : data[0].url;
+    petImage.src = imageUrl;
+    petImage.style.display = 'block';
   });
-});
-// Start hearts on load
-heartInterval = setInterval(createHeart, 500);
 
-// --- Surprise button ---
-document.getElementById('reveal').addEventListener('click', () => {
-  const messages = [
-    "You’re the coolest! 😄💖",
-    "I think about you a lot… 😊",
-    "You make the world brighter 🌟",
-    "I really like you 💖"
-  ];
-  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-  document.getElementById('secretMessage').textContent = randomMessage;
-});
+  // Cambiar idioma
+  toggleLanguageButton.addEventListener('click', () => {
+    isEnglish = !isEnglish;
+    title.textContent = isEnglish ? 'Just For You 💖' : 'Solo Para Ti 💖';
+    aboutText.textContent = isEnglish
+      ? 'You are amazing, funny, and incredibly kind! 😄💖'
+      : '¡Eres increíble, divertido y muy amable! 😄💖';
+    revealButton.textContent = isEnglish ? 'Click me for a secret message!' : '¡Haz clic para un mensaje secreto!';
+    toggleLanguageButton.textContent = isEnglish ? 'Español' : 'English';
+  });
 </script>
 
 </body>
 </html>
+
