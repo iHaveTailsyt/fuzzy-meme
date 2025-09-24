@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Just For You 💖</title>
+<title>Solo Para Ti 💖</title>
 <style>
   body {
     margin: 0;
@@ -13,6 +13,7 @@
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    overflow-x: hidden;
   }
   h1 { color: #ff4d6d; text-align: center; margin-top: 20px; }
   
@@ -34,8 +35,8 @@
   }
   .tab:hover { background: #ff99aa; }
   .tab.active { background: #ff4d6d; color: white; }
-  
-  /* Content */
+
+  /* Contenido */
   .tab-content {
     display: none;
     margin-top: 20px;
@@ -44,8 +45,8 @@
     text-align: center;
   }
   .tab-content.active { display: block; }
-  
-  /* Heart styles */
+
+  /* Corazones */
   .heart {
     position: absolute;
     color: #ff4d6d;
@@ -54,15 +55,12 @@
     user-select: none;
     touch-action: manipulation;
   }
-  
-  /* About You text */
-  .about p {
-    font-size: 20px;
-    color: #ff4d6d;
-  }
-  
-  /* Surprise Button */
-  .surprise button, .pets button {
+
+  /* Sobre ti */
+  .about p { font-size: 20px; color: #ff4d6d; }
+
+  /* Botones */
+  .surprise button, .pets button, .translate button {
     padding: 15px 25px;
     font-size: 18px;
     border: none;
@@ -72,7 +70,7 @@
     cursor: pointer;
     transition: 0.3s;
   }
-  .surprise button:hover, .pets button:hover { background: #ff99aa; }
+  .surprise button:hover, .pets button:hover, .translate button:hover { background: #ff99aa; }
 
   .pets img {
     margin-top: 15px;
@@ -84,50 +82,41 @@
 </head>
 <body>
 
-<h1 id="title">Just For You 💖</h1>
+<h1 id="title">Solo Para Ti 💖</h1>
 
 <div class="tabs">
-  <div class="tab active" data-tab="hearts">Hearts</div>
-  <div class="tab" data-tab="about">About You</div>
-  <div class="tab" data-tab="surprise">Surprise</div>
-  <div class="tab" data-tab="pets">Pets</div>
-  <div class="tab" data-tab="translate">Translate</div>
+  <div class="tab active" data-tab="hearts">Corazones</div>
+  <div class="tab" data-tab="about">Sobre Ti</div>
+  <div class="tab" data-tab="surprise">Sorpresa</div>
+  <div class="tab" data-tab="pets">Mascotas</div>
+  <div class="tab" data-tab="translate">Idioma</div>
 </div>
 
 <div id="hearts" class="tab-content active"></div>
 
 <div id="about" class="tab-content about">
-  <p id="aboutText">You are amazing, funny, and incredibly kind! 😄💖</p>
-  <p>Just thought you should know…</p>
+  <p id="aboutText">¡Eres increíble, divertido y muy amable! 😄💖</p>
+  <p>Solo quería que lo supieras…</p>
 </div>
 
 <div id="surprise" class="tab-content surprise">
-  <button id="reveal">Click me for a secret message!</button>
+  <button id="reveal">¡Haz clic para un mensaje secreto!</button>
   <p id="secretMessage"></p>
 </div>
 
 <div id="pets" class="tab-content pets">
-  <button id="showPet">Show me a cute pet!</button>
+  <button id="showPet">¡Muéstrame una mascota linda!</button>
   <img id="petImage" src="" alt="" style="display:none;">
 </div>
 
 <div id="translate" class="tab-content translate">
-  <button id="toggleLanguage">Español</button>
+  <button id="toggleLanguage">Cambiar Idioma</button>
 </div>
 
 <script>
   // Funcionalidad de pestañas
   const tabs = document.querySelectorAll('.tab');
   const contents = document.querySelectorAll('.tab-content');
-  const title = document.getElementById('title');
-  const aboutText = document.getElementById('aboutText');
-  const revealButton = document.getElementById('reveal');
-  const secretMessage = document.getElementById('secretMessage');
-  const petButton = document.getElementById('showPet');
-  const petImage = document.getElementById('petImage');
-  const toggleLanguageButton = document.getElementById('toggleLanguage');
-
-  let isEnglish = true;
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -138,16 +127,62 @@
     });
   });
 
-  // Mostrar mensaje secreto
+  // --- Corazones ---
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.textContent = '❤️';
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.top = '-50px';
+    heart.addEventListener('click', () => {
+      alert("¡Eres increíble 😄💖!");
+      heart.remove();
+    });
+    document.body.appendChild(heart);
+
+    let top = -50;
+    const fall = setInterval(() => {
+      if (top > window.innerHeight) {
+        heart.remove();
+        clearInterval(fall);
+      } else {
+        top += 2 + Math.random() * 3;
+        heart.style.top = top + 'px';
+      }
+    }, 20);
+  }
+
+  let heartInterval;
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      if(tab.dataset.tab === 'hearts') {
+        if(!heartInterval) heartInterval = setInterval(createHeart, 500);
+      } else {
+        clearInterval(heartInterval);
+        heartInterval = null;
+      }
+    });
+  });
+  // Inicia los corazones al cargar
+  heartInterval = setInterval(createHeart, 500);
+
+  // --- Mensaje secreto ---
+  const revealButton = document.getElementById('reveal');
+  const secretMessage = document.getElementById('secretMessage');
   revealButton.addEventListener('click', () => {
-    const messages = isEnglish
-      ? ["You’re the coolest! 😄💖", "I think about you a lot… 😊", "You make the world brighter 🌟", "You’re truly special 💖"]
-      : ["¡Eres increíble! 😄💖", "Pienso en ti a menudo… 😊", "Haces el mundo más brillante 🌟", "Eres realmente especial 💖"];
+    const messages = [
+      "¡Eres genial! 😄💖",
+      "Pienso en ti mucho… 😊",
+      "Haces el mundo más brillante 🌟",
+      "¡Eres realmente especial 💖"
+    ];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     secretMessage.textContent = randomMessage;
   });
 
-  // Mostrar imagen de mascota
+  // --- Mascotas ---
+  const petButton = document.getElementById('showPet');
+  const petImage = document.getElementById('petImage');
   petButton.addEventListener('click', async () => {
     const petType = Math.random() < 0.5 ? 'dog' : 'cat';
     const url = petType === 'dog'
@@ -160,18 +195,29 @@
     petImage.style.display = 'block';
   });
 
-  // Cambiar idioma
+  // --- Cambio de idioma ---
+  const title = document.getElementById('title');
+  const aboutText = document.getElementById('aboutText');
+  const toggleLanguageButton = document.getElementById('toggleLanguage');
+  let isEnglish = false; // Ahora todo inicia en español
+
   toggleLanguageButton.addEventListener('click', () => {
     isEnglish = !isEnglish;
-    title.textContent = isEnglish ? 'Just For You 💖' : 'Solo Para Ti 💖';
-    aboutText.textContent = isEnglish
-      ? 'You are amazing, funny, and incredibly kind! 😄💖'
-      : '¡Eres increíble, divertido y muy amable! 😄💖';
-    revealButton.textContent = isEnglish ? 'Click me for a secret message!' : '¡Haz clic para un mensaje secreto!';
-    toggleLanguageButton.textContent = isEnglish ? 'Español' : 'English';
+    if(isEnglish){
+      title.textContent = 'Just For You 💖';
+      aboutText.textContent = 'You are amazing, funny, and incredibly kind! 😄💖';
+      revealButton.textContent = 'Click me for a secret message!';
+      petButton.textContent = 'Show me a cute pet!';
+      toggleLanguageButton.textContent = 'Español';
+    } else {
+      title.textContent = 'Solo Para Ti 💖';
+      aboutText.textContent = '¡Eres increíble, divertido y muy amable! 😄💖';
+      revealButton.textContent = '¡Haz clic para un mensaje secreto!';
+      petButton.textContent = '¡Muéstrame una mascota linda!';
+      toggleLanguageButton.textContent = 'Cambiar Idioma';
+    }
   });
 </script>
 
 </body>
 </html>
-
